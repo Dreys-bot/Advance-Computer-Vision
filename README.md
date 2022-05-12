@@ -201,3 +201,79 @@ And we obtain this result:
 ![face](https://github.com/Dreys-bot/Advance-Computer-Vision/blob/main/face.png)
     
     
+
+# Pose Estimation using OpenCv and MediaPipe
+
+![pose](https://github.com/Dreys-bot/Advance-Computer-Vision/blob/main/pose.png)
+
+One of the hardest tasks in computer vision is determining the high degree-of-freedom configuration of a human body with all its limbs, complex self-occlusion, self-similar parts, and large variations due to clothing, body-type, lighting, and many other factors. The problem of human pose estimation can be defined as the computer vision techniques that predict the location of various human keypoints(joints and landmarks) such as elbows, knees, neck, shoulder, hips, chest etc.
+
+## Use Technologies
+To do this project, we use Mediapipe, OpenCV, CV2.
+MediaPipe Pose is a ML solution for high-fidelity body pose tracking, inferring 33 3D landmarks on the whole body from RGB video frames utilizing our BlazePose research that also powers the ML Kit Pose Detection API.
+
+![pose](https://github.com/Dreys-bot/Advance-Computer-Vision/blob/main/HumanPose.png)
+
+# Structures
+We begin by create a python class to estimate the pose and also the class can be used for any further project related to posing estimation.
+```python
+class PoseDetector():
+    def __init__(self, mode = False, upBody = False, smooth = True, detectionCon=0.5, trackCon = 0.5):
+        self.mode = mode
+        self.upBody = upBody
+        self.smooth = smooth
+        self.detectionCon = detectionCon
+        self.trackCon = trackCon
+
+        self.mpPose = mp.solutions.pose
+        self.pose = self.mpPose.Pose()
+        self.mpDraw = mp.solutions.drawing_utils 
+        
+    def findPose(self,video, draw = True):
+        vidRGB = cv2.cvtColor(video, cv2.COLOR_BGR2RGB)
+        self.results = self.pose.process(vidRGB)
+        # print(results.multi_hand_landmarks)
+
+        if self.results.pose_landmarks:
+                if draw:
+                    self.mpDraw.draw_landmarks(video, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
+        return video
+
+    def getPosition(self, video, handNo = 0, draw = True):
+
+        self.lmlist = []
+        if self.results.pose_landmarks:
+            for id, lm in enumerate(self.results.pose_landmarks.landmark):
+                h, w, c = video.shape
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                self.lmlist.append([id, cx, cy])
+                if draw:
+                    cv2.circle(video, (cx, cy), 7, (255, 0, 255), cv2.FILLED)
+        return self.lmlist
+```
+
+## Results
+we have the followed results:
+
+![poseH](https://github.com/Dreys-bot/Advance-Computer-Vision/blob/main/poseH.png)
+
+
+# Removal Background
+In this project, we remove the background of pictures or video to put another pictures.
+
+## Used Technologies
+For this project, we use:
+* OpenCV
+* Numpy
+* MediaPipe
+
+## Structure
+
+The first step is to import necessary packages. After this step, we must initialized the selfie segmentation object from the media pipe framework.
+Then, we read frames from a webcam using cv2.VideoCapture() librairies.
+We must create the segment mask to allow the replacement of the background.
+
+## Results
+The result must be look like:
+
+![back](https://data-flair.training/blogs/wp-content/uploads/sites/2/2021/10/python-remove-image-background-output.webp)
